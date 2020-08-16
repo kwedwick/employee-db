@@ -1,0 +1,33 @@
+{
+  "name": "employee-db",
+  "version": "1.0.0",
+  "description": "To track and update an employee database using inquirer prompts",
+  "main": "index.js",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^7.3.3",
+    "node": "^14.8.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kwedwick/employee-db.git"
+  },
+  "keywords": [
+    "node",
+    "javascript",
+    "inquirer",
+    "mysql",
+    "database",
+    "console.table"
+  ],
+  "author": "kwedwick",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kwedwick/employee-db/issues"
+  },
+  "homepage": "https://github.com/kwedwick/employee-db#readme"
+}
