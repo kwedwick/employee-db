@@ -1,3 +1,5 @@
+USE employee_db;
+
 INSERT INTO department (name)
 VALUES
     ('HR'),
@@ -20,18 +22,18 @@ VALUES
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES
-('Diane', 'Smith', 1, 3),
-('Jane', 'Doe', 2, 6),
 ('Bob', 'Barker', 3, NULL),
-('Will', 'Smith', 4, 12),
-('Chris', 'Evans', 5, 14),
-('Angelina', 'Jolie', 6, NULL),
-('Kevin', 'Bacon', 2, 15),
-('Britney', 'Spears', 3, 3),
-('Nikki', 'Minaj', 4, 6),
-('Diana', 'Ross', 5, 12),
-('Carrie', 'Fisher', 1, 14),
 ('Barak', 'Obama', 1, NULL),
-('Bill', 'Nye', 2, 15),
+('Angelina', 'Jolie', 6, NULL),
 ('Nancy', 'Pelosi', 3, NULL),
-('Mitch', 'McConnel', 4, NULL);
+('Mitch', 'McConnel', 4, NULL),
+('Jane', 'Doe', 2, 1),
+('Kevin', 'Bacon', 2, 2),
+('Britney', 'Spears', 3, 3),
+('Nikki', 'Minaj', 4, 4),
+('Diana', 'Ross', 5, 5),
+('Carrie', 'Fisher', 1, 1),
+('Diane', 'Smith', 1, 2),
+('Bill', 'Nye', 2, 3),
+('Will', 'Smith', 4, 4),
+('Chris', 'Evans', 5, 5);

@@ -7,14 +7,12 @@
     "console.table": "^0.10.0",
     "inquirer": "^7.3.3",
     "jest": "^26.4.0",
+    "mysql2": "^2.1.0",
     "node": "^14.8.0"
   },
   "devDependencies": {},
   "scripts": {
     "test": "jest",
-    "migrate": "sqlite3 db/employee.db < db/schema.sql",
-    "seed": "sqlite3 db/employee.db < db/seeds.sql",
-    "db": "sqlite3 db/employee.db",
     "start": "node server.js"
   },
   "repository": {
