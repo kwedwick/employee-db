@@ -11,17 +11,6 @@ const connection = mysql.createConnection({
     database: 'employee_db'
 });
 
-// connection.query(
-//     'SELECT * FROM employee',
-//     function(err, results, fields) {
-//         if (err) {
-//             console.log(err);
-//             return;
-//         }
-//         console.log(results);
-//     }
-// );
-
 connection.connect(function (err) {
     if (err) throw err;
     console.log("Connected!");
@@ -87,15 +76,22 @@ viewDepartments = () => {
         params,
         function (err, res) {
             if (err) throw err;
-            console.log(res);
-            //console.table(values[0]);
+            let values = [res]
+            console.table(values[0]);
             //taking user back to choice selection
             mainMenu();
         }
     )
 };
 
-//console.log(query.sql);
+// viewDepartments = () => {
+//     connection.promise().query(
+//         'SELECT * FROM department').then(values => {
+//             console.table('\n', values[0]);
+//         });
+//         mainMenu();
+// };
+
 // WHEN I choose to view all roles
 // THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
 
@@ -107,7 +103,8 @@ viewRoles = () => {
         params,
         function (err, res) {
             if (err) throw err;
-            console.log(res);
+            let values = [res]
+            console.table(values[0]);
             //console.table(values[0]);
             //taking user back to choice selection
             mainMenu();
@@ -126,8 +123,8 @@ viewEmployees = () => {
         params,
         function (err, res) {
             if (err) throw err;
-            console.log(res);
-            //console.table(values[0]);
+            let values = [res]
+            console.table(values[0]);
             //taking user back to choice selection
             mainMenu();
         }
@@ -163,8 +160,8 @@ addDeparment = () => {
                 params,
                 function (err, res) {
                     if (err) throw err;
-                    console.log(res);
-                    //console.table(values[0]);
+                    let values = [res]
+                    console.table(values[0]);
                     //taking user back to choice selection
                     mainMenu();
                 }
@@ -180,7 +177,7 @@ addRole = () => {
         .prompt([
             {
                 type: 'input',
-                name: 'role',
+                name: 'title',
                 message: 'Write the name of the new ROLE:',
                 validate: nameInput => {
                     if (nameInput) {
@@ -206,23 +203,24 @@ addRole = () => {
             },
             {
                 type: 'list',
-                name: 'departmentId',
+                name: 'department_id',
                 message: 'Choose a department:',
                 choices: []
-            },
+            }
         ]).then(response => {
             console.log(response);
-            let role = response.role;
+            let title = response.title;
             let salary = response.salary;
-            let departmentId = response.id;
+            let department_id = response.id;
             console.log(userInput);
-            const params = [role, salary, departmentId];
+            const params = [title, salary, department_id];
             const query = connection.query(
-                'INSERT INTO role (name)',
+                'INSERT INTO role (title, salary, department_id)',
                 params,
                 function (err, res) {
-                    if (err) throw err;
-                    console.log(res);
+                    if (err) throw error;
+                    let values = [res]
+                    console.table(values[0]);
                     //console.table(values[0]);
                     //taking user back to choice selection
                     mainMenu();
@@ -233,6 +231,68 @@ addRole = () => {
 
 // WHEN I choose to add an employee
 // THEN I am prompted to enter the employee’s first name, last name, role, and manager and that employee is added to the database
+
+addEmployee = () => {
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'first_name',
+                message: 'Write only the FIRST NAME of EMPLOYEE:',
+                validate: nameInput => {
+                    if (nameInput) {
+                        return true;
+                    } else {
+                        console.log("Please enter only their FIRST NAME.");
+                        return false;
+                    }
+                },
+            },
+            {
+                type: 'input',
+                name: 'last_name',
+                message: 'Write only the LAST NAME of EMPLOYEE:',
+                validate: salaryInput => {
+                    if (salaryInput) {
+                        return true;
+                    } else {
+                        console.log("Please enter only their LAST NAME.");
+                        return false;
+                    }
+                },
+            },
+            {
+                type: 'list',
+                name: 'role',
+                message: 'Choose a role:',
+                choices: []
+            },
+            {
+                type: 'list',
+                name: 'manager_id',
+                message: 'Choose a manager:',
+                choices: []
+            }
+        ]).then(response => {
+            console.log(response);
+            let role = response.role;
+            let salary = response.salary;
+            let departmentId = response.id;
+            console.log(userInput);
+            const params = [role, salary, departmentId];
+            const query = connection.query(
+                'INSERT INTO employee (first_name, last_name, role_id, manager_id)',
+                params,
+                function (err, res) {
+                    if (err) throw err;
+                    let values = [res]
+                    console.table(values[0]);
+                    //taking user back to choice selection
+                    mainMenu();
+                }
+            )
+        })
+};
 
 // WHEN I choose to update an employee role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
