@@ -3,6 +3,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
+//const Database = require('./db/database')
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -105,7 +106,6 @@ viewRoles = () => {
             if (err) throw err;
             let values = [res]
             console.table(values[0]);
-            //console.table(values[0]);
             //taking user back to choice selection
             mainMenu();
         }
@@ -205,7 +205,7 @@ addRole = () => {
                 type: 'list',
                 name: 'department_id',
                 message: 'Choose a department:',
-                choices: []
+                choices: [managerIdArray]
             }
         ]).then(response => {
             console.log(response);
@@ -221,7 +221,6 @@ addRole = () => {
                     if (err) throw error;
                     let values = [res]
                     console.table(values[0]);
-                    //console.table(values[0]);
                     //taking user back to choice selection
                     mainMenu();
                 }
@@ -233,11 +232,15 @@ addRole = () => {
 // THEN I am prompted to enter the employee’s first name, last name, role, and manager and that employee is added to the database
 
 addEmployee = () => {
+    connection.promise().query('SELECT id FROM employee WHERE employee.is_manager = 1').then(res => {
+        console.table(res[0], '\n')
+        var managerIdArray = [res[0]]
+    })
     inquirer
         .prompt([
             {
                 type: 'input',
-                name: 'first_name',
+                name: 'firstName',
                 message: 'Write only the FIRST NAME of EMPLOYEE:',
                 validate: nameInput => {
                     if (nameInput) {
@@ -250,7 +253,7 @@ addEmployee = () => {
             },
             {
                 type: 'input',
-                name: 'last_name',
+                name: 'lastName',
                 message: 'Write only the LAST NAME of EMPLOYEE:',
                 validate: salaryInput => {
                     if (salaryInput) {
@@ -264,24 +267,47 @@ addEmployee = () => {
             {
                 type: 'list',
                 name: 'role',
-                message: 'Choose a role:',
+                message: 'Choose a Role:',
                 choices: []
             },
             {
+                type: 'confirm',
+                name: 'managerConfirm',
+                message: 'Is this EMPLOYEE a Manager?',
+                default: false
+            },
+            {
+                type: 'confirm',
+                name: 'addManagerConfirm',
+                message: 'Add a manager?',
+                default: true
+            },
+            {
                 type: 'list',
-                name: 'manager_id',
-                message: 'Choose a manager:',
+                name: 'managerId',
+                message: 'Choose a Manager:',
+                when: ({ addManagerConfirm}) => addManagerConfirm,
                 choices: []
             }
         ]).then(response => {
             console.log(response);
-            let role = response.role;
-            let salary = response.salary;
-            let departmentId = response.id;
+            let first_name = response.firstName;
+            let last_name = response.lastName;
+            let role_id = response.role;
+            if (response.managerConfirm === true) {
+                var manager_id = response.managerId
+            } else if (response.managerConfirm === false) {
+                var manager_id = response.managerId
+            };
+            if (response.addManagerConfirm === true) {
+                var isManager = true
+            } else if (response.addManagerConfirm === false){
+                var isManager = false
+            }
             console.log(userInput);
-            const params = [role, salary, departmentId];
+            const params = [first_name, last_name, role_id, isManager, manager_id];
             const query = connection.query(
-                'INSERT INTO employee (first_name, last_name, role_id, manager_id)',
+                'INSERT INTO employee (first_name, last_name, role_id, is_manager, manager_id)',
                 params,
                 function (err, res) {
                     if (err) throw err;
