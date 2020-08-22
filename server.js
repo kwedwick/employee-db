@@ -7,7 +7,7 @@ const cTable = require('console.table');
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Elephantww67?',
+    password: '',
     database: 'employee_db'
 });
 
