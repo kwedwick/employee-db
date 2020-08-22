@@ -8,11 +8,11 @@ function loadEmployees() {
         params,
         function (err, res) {
             if (err) throw err;
-            return res[0]
+            let values = [res]
+            return values[0]
             //taking user back to choice selection
         }
     )
-    return;
 };
 
 function returnRoles() {
@@ -27,6 +27,20 @@ function returnRoles() {
             return values[0];
         }
     )
+};
+
+function updateEmployeeRole(employeeId, roleId) {
+    const params = [roleId, employeeId]
+    const query = connection.query(
+        'UPDATE employee SET role_id = ? WHERE id = ?',
+        params,
+        function (err, res) {
+            if (err) throw err;
+            let values = [res];
+            return values[0];
+        }
+    )
 }
 
-module.exports = {loadEmployees, returnRoles};
+//module.exports = new DB(connection)
+module.exports = { loadEmployees, returnRoles, updateEmployeeRole };

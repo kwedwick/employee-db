@@ -152,13 +152,13 @@ addDeparment = () => {
             const params = [departmentName];
             console.log(params);
             const query = connection.query(
-                'INSERT INTO department (name) VALUES = ?',
+                'INSERT INTO department (name) VALUES (?)',
                 params,
                 function (err, res) {
                     if (err) throw err;
                     let values = [res]
                     //console.table(values[0]);
-                    console.log(values);
+                    console.log(values[0]);
                     //taking user back to choice selection
                     mainMenu();
                 }
@@ -214,11 +214,11 @@ async function addRole() {
             console.log(response);
             let title = response.title;
             let salary = response.salary;
-            let department_id = response.departmnent;
+            let department_id = response.department;
             const params = [title, salary, department_id];
             console.log(params);
             const query = connection.query(
-                'INSERT INTO role (title, salary, department_id) VALUES = ?',
+                'INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)',
                 params,
                 function (err, res) {
                     if (err) throw error;
@@ -312,7 +312,7 @@ async function addEmployee() {
             const params = [first_name, last_name, role_id, isManager, manager_id];
             //const params = []
             const query = connection.query(
-                'INSERT INTO employee (first_name, last_name, role_id, is_manager, manager_id) VALUES = (?,?,?,?,?)',
+                'INSERT INTO employee (first_name, last_name, role_id, is_manager, manager_id) VALUES (?,?,?,?,?)',
                 params,
                 function (err, res) {
                     if (err) throw err;
@@ -328,7 +328,7 @@ async function addEmployee() {
 // WHEN I choose to update an employee role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
 async function updateEmployeeRole() {
-    const employees = await connection.loadEmployees();
+    const employees = await loadEmployees();//.catch(console.log(err));
 
     const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
         name: `${first_name} ${last_name}`,
@@ -344,7 +344,7 @@ async function updateEmployeeRole() {
         }
     ]);
 
-    const roles = await connection.findAllRoles();
+    const roles = await connection.returnRoles();
 
     const roleChoices = roles.map(({ id, title }) => ({
         name: title,
