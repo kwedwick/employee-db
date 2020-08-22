@@ -1,16 +1,13 @@
 
-//const db = require('./db/database');
+const connection = require('./db/database');
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
-//const Database = require('./db/database')
+const sqlCalls = require('./utils/sql-calls');
+//const { connect } = require('./db/database');
 
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Elephantww67?',
-    database: 'employee_db'
-});
+
+
 
 connection.connect(function (err) {
     if (err) throw err;
@@ -151,9 +148,8 @@ addDeparment = () => {
                 },
             },
         ]).then(response => {
-            let userInput = response.department
-            console.log(userInput);
-            const params = [(userInput)];
+            let departmentName = response.department
+            const params = [departmentName];
             console.log(params);
             const query = connection.query(
                 'INSERT INTO department (name) VALUES = ?',
@@ -161,7 +157,8 @@ addDeparment = () => {
                 function (err, res) {
                     if (err) throw err;
                     let values = [res]
-                    console.table(values[0]);
+                    //console.table(values[0]);
+                    console.log(values);
                     //taking user back to choice selection
                     mainMenu();
                 }
@@ -172,7 +169,13 @@ addDeparment = () => {
 // WHEN I choose to add a role
 // THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
 
-addRole = () => {
+async function addRole() {
+    const department = await connection.promise().query('SELECT * FROM department')
+    console.log(department[0]);
+    const departmentChoices = department[0].map(({ id, name}) => ({
+        name: `${name}`,
+        value: id
+    }));
     inquirer
         .prompt([
             {
@@ -203,19 +206,19 @@ addRole = () => {
             },
             {
                 type: 'list',
-                name: 'department_id',
+                name: 'department',
                 message: 'Choose a department:',
-                choices: [managerIdArray]
+                choices: departmentChoices
             }
         ]).then(response => {
             console.log(response);
             let title = response.title;
             let salary = response.salary;
-            let department_id = response.id;
-            console.log(userInput);
+            let department_id = response.departmnent;
             const params = [title, salary, department_id];
+            console.log(params);
             const query = connection.query(
-                'INSERT INTO role (title, salary, department_id)',
+                'INSERT INTO role (title, salary, department_id) VALUES = ?',
                 params,
                 function (err, res) {
                     if (err) throw error;
@@ -231,11 +234,19 @@ addRole = () => {
 // WHEN I choose to add an employee
 // THEN I am prompted to enter the employee’s first name, last name, role, and manager and that employee is added to the database
 
-addEmployee = () => {
-    connection.promise().query('SELECT id FROM employee WHERE employee.is_manager = 1').then(res => {
-        console.table(res[0], '\n')
-        var managerIdArray = [res[0]]
-    })
+async function addEmployee() {
+    const manager = await connection.promise().query('SELECT id, first_name, last_name FROM employee WHERE employee.is_manager = 1')
+    console.log(manager[0]);
+    const managerChoices = manager[0].map(({ id, first_name, last_name }) => ({
+        name: `${first_name} ${last_name}`,
+        value: id
+    }));
+    console.log(managerChoices);
+    const role = await connection.promise().query('SELECT id, title FROM role')
+    const roleChoices = role[0].map(({ id, title}) => ({
+        name: `${title}`,
+        value: id
+    }));
     inquirer
         .prompt([
             {
@@ -268,7 +279,7 @@ addEmployee = () => {
                 type: 'list',
                 name: 'role',
                 message: 'Choose a Role:',
-                choices: []
+                choices: roleChoices
             },
             {
                 type: 'confirm',
@@ -286,32 +297,26 @@ addEmployee = () => {
                 type: 'list',
                 name: 'managerId',
                 message: 'Choose a Manager:',
-                when: ({ addManagerConfirm}) => addManagerConfirm,
-                choices: []
+                when: ({ addManagerConfirm }) => addManagerConfirm,
+                choices: managerChoices
             }
         ]).then(response => {
             console.log(response);
             let first_name = response.firstName;
             let last_name = response.lastName;
             let role_id = response.role;
-            if (response.managerConfirm === true) {
-                var manager_id = response.managerId
-            } else if (response.managerConfirm === false) {
-                var manager_id = response.managerId
-            };
-            if (response.addManagerConfirm === true) {
-                var isManager = true
-            } else if (response.addManagerConfirm === false){
-                var isManager = false
-            }
-            console.log(userInput);
+            let isManager = response.managerConfirm;
+            let manager_id = response.managerId;
+            console.log(manager_id);
+            let dbparams = {response}
             const params = [first_name, last_name, role_id, isManager, manager_id];
+            //const params = []
             const query = connection.query(
-                'INSERT INTO employee (first_name, last_name, role_id, is_manager, manager_id)',
+                'INSERT INTO employee (first_name, last_name, role_id, is_manager, manager_id) VALUES = (?,?,?,?,?)',
                 params,
                 function (err, res) {
                     if (err) throw err;
-                    let values = [res]
+                    let values = [res];
                     console.table(values[0]);
                     //taking user back to choice selection
                     mainMenu();
@@ -321,4 +326,43 @@ addEmployee = () => {
 };
 
 // WHEN I choose to update an employee role
-// THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
+// THEN I am prompted to select an employee to update and their new role and this information is updated in the database
+async function updateEmployeeRole() {
+    const employees = await connection.loadEmployees();
+
+    const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
+        name: `${first_name} ${last_name}`,
+        value: id
+    }));
+
+    const { employeeId } = await prompt([
+        {
+            type: "list",
+            name: "employeeId",
+            message: "Which employee's role do you want to update?",
+            choices: employeeChoices
+        }
+    ]);
+
+    const roles = await connection.findAllRoles();
+
+    const roleChoices = roles.map(({ id, title }) => ({
+        name: title,
+        value: id
+    }));
+
+    const { roleId } = await prompt([
+        {
+            type: "list",
+            name: "roleId",
+            message: "Which role do you want to assign the selected employee?",
+            choices: roleChoices
+        }
+    ]);
+
+    await connection.updateEmployeeRole(employeeId, roleId);
+
+    console.log("Updated employee's role");
+
+    mainMenu();
+};
