@@ -20,6 +20,8 @@ You'll need Node.JS to use this project. You'll need open the integrated termine
 ## Usage
 
 Once you have followed the installation instructions, the following dependencies will be installed: console.table, dotenv, inquirer, jest, mysql12, and node. Console.table puts the data in a readable format, you'll put your username and password in a .env file so the database can run, inquirer is used to interact with the user, mysql2 will help you manage the database. Once the integrated terminal is open, you'll type "npm start" and all of the prompts will come up for you to interact with. 
+
+View a walkthrough video [here](https://drive.google.com/file/d/1PjKtNK4CgNlXZSyHY-ULXz8KHQdpuycU/view).
     
 
 ![GitHub license](https://img.shields.io/badge/license-isc-blue.svg)
