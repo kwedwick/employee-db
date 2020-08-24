@@ -15,9 +15,6 @@ connection.connect(function (err) {
     mainMenu();
 });
 
-
-//connection.promise() answers return and asks database // source it with schema and seeds / source schema.sql; enter source seeds.sql;
-
 // WHEN I start the application
 // THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
 function mainMenu() {
@@ -319,7 +316,7 @@ async function addEmployee() {
                     let values = [res];
                     console.table(values[0]);
                     //taking user back to choice selection
-                    mainMenu();
+                    viewEmployees();
                 }
             )
         })

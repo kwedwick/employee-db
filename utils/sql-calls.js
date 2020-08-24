@@ -1,6 +1,8 @@
 const mysql = require('mysql2');
 const connection = require('../db/database');
 
+//couldn't get this to work correctly with the inquirer prompts loading prior to these finishing.
+
 function loadEmployees() {
     const params = {};
     const query = connection.query(
