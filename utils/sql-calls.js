@@ -9,8 +9,13 @@ function loadEmployees() {
         function (err, res) {
             if (err) throw err;
             let values = [res]
-            return values[0]
-            //taking user back to choice selection
+            //console.log(values[0])
+            const employeeChoices = values[0].map(({ id, first_name, last_name }) => ({
+                name: `${first_name} ${last_name}`,
+                value: id
+            }));
+            //console.log(employeeChoices)
+            return employeeChoices
         }
     )
 };
@@ -24,7 +29,12 @@ function returnRoles() {
         function (err, res) {
             if (err) throw err;
             let values = [res];
-            return values[0];
+            
+            const roleChoices = values[0].map(({ id, title }) => ({
+                name: title,
+                value: id
+            }));
+            return roleChoices;
         }
     )
 };

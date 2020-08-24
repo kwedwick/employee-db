@@ -3,7 +3,7 @@ const connection = require('./db/database');
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
-const sqlCalls = require('./utils/sql-calls');
+//const sqlCalls = require('./utils/sql-calls');
 //const { connect } = require('./db/database');
 
 
@@ -327,42 +327,51 @@ async function addEmployee() {
 
 // WHEN I choose to update an employee role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
-async function updateEmployeeRole() {
-    const employees = await loadEmployees();//.catch(console.log(err));
 
-    const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
+
+async function updateEmployeeRole() {
+    const employees = await connection.promise().query('SELECT id, first_name, last_name FROM employee');
+    const employeeChoices = employees[0].map(({ id, first_name, last_name }) => ({
         name: `${first_name} ${last_name}`,
         value: id
     }));
+    console.log(employeeChoices)
+    const roles = await connection.promise().query('SELECT * FROM role');
+    const roleChoices = roles[0].map(({ id, title }) => ({
+        name: title,
+        value: id
+    }));
+    console.log(roleChoices);
 
-    const { employeeId } = await prompt([
+    inquirer.prompt ([
         {
             type: "list",
             name: "employeeId",
             message: "Which employee's role do you want to update?",
             choices: employeeChoices
-        }
-    ]);
-
-    const roles = await connection.returnRoles();
-
-    const roleChoices = roles.map(({ id, title }) => ({
-        name: title,
-        value: id
-    }));
-
-    const { roleId } = await prompt([
+        },
         {
             type: "list",
             name: "roleId",
             message: "Which role do you want to assign the selected employee?",
             choices: roleChoices
         }
-    ]);
-
-    await connection.updateEmployeeRole(employeeId, roleId);
-
-    console.log("Updated employee's role");
-
-    mainMenu();
-};
+    ])
+    .then(updatedChoices => {
+        let role_id = updatedChoices.roleId;
+        let id = updatedChoices.employeeId
+        const params = [role_id, id];
+        console.log(params)
+        const query = connection.query(
+            'UPDATE employee SET role_id = (?) WHERE id = (?)',
+            params,
+            function (err, res) {
+                if (err) throw err;
+                let values = [res];
+                console.table(values[0]);
+                //taking user back to choice selection
+                viewEmployees();
+            }
+        )
+    })
+}
